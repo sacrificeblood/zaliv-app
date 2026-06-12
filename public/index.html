@@ -80,6 +80,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .camp-date-label { font-size: 10px; color: #334155; flex-shrink: 0; white-space: nowrap; }
 .camp-del-btn { opacity: 0; color: #ef4444; cursor: pointer; font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
 .camp-row:hover .camp-del-btn { opacity: 1; }
+.camp-status { font-size: 14px; cursor: pointer; flex-shrink: 0; user-select: none; }
+.camp-status:hover { transform: scale(1.2); }
+.camp-account { font-size: 10px; color: #475569; flex-shrink: 0; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.camp-account:hover { color: #94a3b8; }
+.camp-account.empty { color: #2d3248; font-style: italic; }
+.camp-comment { font-size: 10px; color: #475569; flex-shrink: 0; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.camp-comment:hover { color: #94a3b8; }
+.camp-comment.empty { color: #2d3248; }
+/* status colors in table */
+.ze-status { font-size: 12px; flex-shrink: 0; }
+.ze.status-ok { background: #052e16 !important; }
+.ze.status-ban { background: #450a0a !important; }
 .empty-msg { padding: 20px; text-align: center; color: #334155; font-size: 12px; }
 
 /* TABLE PAGE */
@@ -551,11 +563,69 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     area.querySelectorAll('[data-del-camp]').forEach(function (btn) {
       btn.addEventListener('click', function () { delCamp(parseInt(btn.getAttribute('data-del-camp'))); });
     });
+    area.querySelectorAll('[data-cycle]').forEach(function (btn) {
+      btn.addEventListener('click', function () { cycleStatus(parseInt(btn.getAttribute('data-cycle'))); });
+    });
+    area.querySelectorAll('[data-edit-account]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var id = parseInt(el.getAttribute('data-edit-account'));
+        var c = campaigns.find(function(x) { return x.id === id; });
+        editField(id, 'account', c ? c.account : '');
+      });
+    });
+    area.querySelectorAll('[data-edit-comment]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var id = parseInt(el.getAttribute('data-edit-comment'));
+        var c = campaigns.find(function(x) { return x.id === id; });
+        editField(id, 'comment', c ? c.comment : '');
+      });
+    });
+  }
+
+  function statusEmoji(s) {
+    if (s === 'ok') return '🟢';
+    if (s === 'ban') return '🔴';
+    return '🟡';
+  }
+  function nextStatus(s) {
+    if (s === 'pending') return 'ok';
+    if (s === 'ok') return 'ban';
+    return 'pending';
+  }
+
+  async function cycleStatus(id) {
+    var c = campaigns.find(function(x) { return x.id === id; });
+    if (!c) return;
+    var newStatus = nextStatus(c.status || 'pending');
+    try {
+      var saved = await req('/api/campaigns/' + id, 'PATCH', { status: newStatus, comment: c.comment || '', account: c.account || '' });
+      var i = campaigns.findIndex(function(x) { return x.id === id; });
+      if (i !== -1) campaigns[i] = saved;
+      renderPlanCamps();
+    } catch(e) { toast('Ошибка', 'err'); }
+  }
+
+  function editField(id, field, current) {
+    var val = prompt(field === 'account' ? 'Аккаунт:' : 'Комментарий:', current || '');
+    if (val === null) return;
+    var c = campaigns.find(function(x) { return x.id === id; });
+    if (!c) return;
+    var update = { status: c.status || 'pending', comment: c.comment || '', account: c.account || '' };
+    update[field] = val;
+    req('/api/campaigns/' + id, 'PATCH', update).then(function(saved) {
+      var i = campaigns.findIndex(function(x) { return x.id === id; });
+      if (i !== -1) campaigns[i] = saved;
+      renderPlanCamps();
+    }).catch(function() { toast('Ошибка', 'err'); });
   }
 
   function campRow(c) {
+    var status = c.status || 'pending';
     return '<div class="camp-row">'
+      + '<span class="camp-status" data-cycle="' + c.id + '" title="Сменить статус">' + statusEmoji(status) + '</span>'
       + '<span class="camp-neyming" data-copy-camp="' + esc(c.neyming) + '">' + esc(c.neyming) + '</span>'
+      + '<span class="camp-account' + (!c.account ? ' empty' : '') + '" data-edit-account="' + c.id + '" title="Аккаунт (кликни чтобы изменить)">' + esc(c.account || 'аккаунт') + '</span>'
+      + '<span class="camp-comment' + (!c.comment ? ' empty' : '') + '" data-edit-comment="' + c.id + '" title="Комментарий (кликни чтобы изменить)">' + esc(c.comment || '...') + '</span>'
       + '<span class="camp-date-label">' + fmtDate(c.plan_date) + '</span>'
       + '<span class="camp-del-btn" data-del-camp="' + c.id + '">&times;</span>'
       + '</div>';
@@ -626,9 +696,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           var c = cols[s.id][i];
           html += '<td><div class="cell-inner">';
           if (c) {
-            html += '<div class="ze" data-n="' + esc(c.neyming) + '">'
+            var stCls = c.status === 'ok' ? ' status-ok' : c.status === 'ban' ? ' status-ban' : '';
+            html += '<div class="ze' + stCls + '" data-n="' + esc(c.neyming) + '" title="' + esc(c.account || '') + (c.comment ? ' — ' + esc(c.comment) : '') + '">'
               + '<div class="ze-plt ' + (c.platform === 'ios' ? 'ios' : 'and') + '">' + (c.platform === 'ios' ? 'I' : 'A') + '</div>'
               + '<div class="ze-text">' + esc(c.neyming) + '</div>'
+              + '<span class="ze-status">' + statusEmoji(c.status || 'pending') + '</span>'
               + '</div>';
           }
           html += '</div></td>';
