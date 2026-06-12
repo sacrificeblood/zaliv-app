@@ -723,44 +723,84 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       });
       var maxR = 0;
       shown.forEach(function (s) { if (cols[s.id].length > maxR) maxR = cols[s.id].length; });
+
+      // Build table header: # | src1 cols (neyming + status) | src2 cols ...
       var html = '<table class="ztbl"><thead><tr><th class="th-num"></th>';
       shown.forEach(function (s) {
-        html += '<th><div class="th-inner">'
+        html += '<th colspan="2"><div class="th-inner">'
           + '<div class="th-src-name">' + esc(s.name) + '</div>'
           + (s.key_link ? '<div class="th-src-key">' + esc(s.key_link) + '</div>' : '')
           + '<div class="th-src-cnt">' + cols[s.id].length + ' кампаний</div>'
           + '</div></th>';
       });
+      html += '</tr>'
+        + '<tr><th class="th-num"></th>';
+      shown.forEach(function () {
+        html += '<th style="background:#141720;border:1px solid #2d3248;padding:5px 8px;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:52px">Кампания</th>'
+               + '<th style="background:#141720;border:1px solid #2d3248;padding:5px 8px;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.5px;width:90px;min-width:90px;position:sticky;top:52px">Статус</th>';
+      });
       html += '</tr></thead><tbody>';
+
       for (var i = 0; i < maxR; i++) {
         html += '<tr><td class="td-num">' + (i+1) + '</td>';
         shown.forEach(function (s) {
           var c = cols[s.id][i];
-          html += '<td><div class="cell-inner">';
+          var src = sources.find(function(x) { return x.id === s.id; }) || s;
           if (c) {
             var st = c.status || 'pending';
-            html += '<div class="ze s-' + st + '" data-camp-id="' + c.id + '">'
+            var stLabel = st === 'ok' ? 'Прошло' : st === 'ban' ? 'Бан' : 'В процессе';
+            var stColor = st === 'ok' ? '#4ade80' : st === 'ban' ? '#f87171' : '#eab308';
+            var stBg = st === 'ok' ? '#052e16' : st === 'ban' ? '#450a0a' : '#1c1a05';
+            // neyming cell
+            html += '<td style="border:1px solid #1e293b;padding:0;background:#0f1117;vertical-align:top">'
+              + '<div style="padding:5px 8px;cursor:pointer" data-copy-camp="' + c.id + '" data-neyming="' + esc(c.neyming) + '" data-src-key="' + esc(src.key_link || '') + '">'
+              + '<div style="display:flex;align-items:center;gap:4px">'
               + '<div class="ze-plt ' + (c.platform === 'ios' ? 'ios' : 'and') + '">' + (c.platform === 'ios' ? 'I' : 'A') + '</div>'
-              + '<div style="flex:1;min-width:0">'
-              + '<div class="ze-text">' + esc(c.neyming) + '</div>'
-              + (c.account ? '<div class="ze-account">' + esc(c.account) + '</div>' : '')
-              + (c.comment ? '<div class="ze-comment">' + esc(c.comment) + '</div>' : '')
+              + '<div style="font-size:11px;font-family:monospace;color:#94a3b8;word-break:break-all;line-height:1.4">' + esc(c.neyming) + '</div>'
               + '</div>'
-              + '<span class="ze-status s-' + st + '">' + (st === 'ok' ? 'Прошло' : st === 'ban' ? 'Бан' : '') + '</span>'
-              + '</div>';
+              + (c.account ? '<div style="font-size:10px;color:#475569;margin-top:2px;padding-left:17px">' + esc(c.account) + '</div>' : '')
+              + (c.comment ? '<div style="font-size:10px;color:#334155;font-style:italic;margin-top:1px;padding-left:17px">' + esc(c.comment) + '</div>' : '')
+              + '</div></td>';
+            // status cell
+            html += '<td style="border:1px solid #1e293b;padding:0;background:#0f1117;vertical-align:top;width:90px;cursor:pointer" data-open-ep="' + c.id + '">'
+              + '<div style="padding:6px 8px;height:100%">'
+              + (st !== 'pending'
+                ? '<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;background:' + stBg + ';color:' + stColor + '">' + stLabel + '</span>'
+                : '<span style="font-size:11px;color:#334155">—</span>')
+              + '</div></td>';
+          } else {
+            html += '<td style="border:1px solid #1e293b;background:#0f1117"></td>';
+            html += '<td style="border:1px solid #1e293b;background:#0f1117"></td>';
           }
-          html += '</div></td>';
         });
         html += '</tr>';
       }
       html += '</tbody></table>';
       wrap.innerHTML = html;
-      wrap.querySelectorAll('.ze').forEach(function (el) {
+
+      // Copy camp: insert neyming into {sub3} of key_link
+      wrap.querySelectorAll('[data-copy-camp]').forEach(function (el) {
         el.addEventListener('click', function () {
-          var cid = parseInt(el.getAttribute('data-camp-id'));
-          openEditPanel(cid, dateCamps);
+          var neyming = el.getAttribute('data-neyming');
+          var keyLink = el.getAttribute('data-src-key');
+          var result;
+          if (keyLink && keyLink.indexOf('{sub3}') !== -1) {
+            result = keyLink.replace('{sub3}', neyming);
+          } else {
+            result = neyming;
+          }
+          navigator.clipboard.writeText(result).then(function () { toast('Скопировано', 'ok'); });
         });
       });
+
+      // Open edit panel on status cell click
+      wrap.querySelectorAll('[data-open-ep]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var cid = parseInt(el.getAttribute('data-open-ep'));
+          openEditPanel(cid, dc);
+        });
+      });
+
     } catch (e) { wrap.innerHTML = '<div class="no-data">Ошибка загрузки</div>'; }
   }
 
