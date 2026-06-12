@@ -119,18 +119,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .dtab:hover { border-color: #16a34a; color: #4ade80; }
 .dtab.today { border-color: #14532d; color: #4ade80; }
 .dtab.active { background: #052e16; border-color: #16a34a; color: #bbf7d0; font-weight: 700; }
-.tbl-filters { display: flex; align-items: flex-start; gap: 16px; padding: 10px 16px; border-bottom: 1px solid #1e293b; background: #0f1117; flex-shrink: 0; flex-wrap: wrap; }
-.tbl-filters-group { display: flex; flex-direction: column; gap: 5px; }
+.tbl-filters { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid #1e293b; background: #0f1117; flex-shrink: 0; flex-wrap: wrap; }
+.tbl-filters-group { display: flex; flex-direction: column; gap: 3px; }
 .tbl-filters-label { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-.filter-chips-row { display: flex; gap: 5px; flex-wrap: wrap; }
-.filter-chip { padding: 3px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; border: 1px solid #2d3248; color: #64748b; transition: all .12s; white-space: nowrap; }
-.filter-chip:hover { border-color: #475569; color: #e2e8f0; }
-.filter-chip.active { background: #1a1d27; border-color: #16a34a; color: #4ade80; font-weight: 600; }
+.filter-select { background: #1a1d27; border: 1px solid #2d3248; border-radius: 6px; padding: 5px 28px 5px 10px; color: #e2e8f0; font-size: 12px; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2364748b'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; min-width: 120px; }
+.filter-select:focus { border-color: #16a34a; }
+.filter-chip { display: none; }
+.filter-chips-row { display: none; }
 .filter-sep { display: none; }
+.tbl-wrap { flex: 1; overflow: auto; }
+.tbl-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+.tbl-wrap::-webkit-scrollbar-track { background: #0f1117; }
+.tbl-wrap::-webkit-scrollbar-thumb { background: #2d3248; border-radius: 4px; }
+.tbl-wrap::-webkit-scrollbar-thumb:hover { background: #3d4468; }
+.tbl-wrap::-webkit-scrollbar-corner { background: #0f1117; }
 .no-data { padding: 60px; text-align: center; color: #334155; font-size: 13px; }
 
 /* NEW TABLE STYLES */
-.ztbl { border-collapse: collapse; }
+.ztbl { border-collapse: collapse; white-space: nowrap; }
 .ztbl-num { width: 44px; min-width: 44px; background: #141720; border: 1px solid #2d3248; text-align: center; font-size: 12px; color: #475569; font-weight: 600; padding: 8px 0; position: sticky; top: 0; z-index: 11; }
 .ztbl-src-hdr { background: #1a1d27; border: 1px solid #2d3248; padding: 10px 14px; text-align: center; position: sticky; top: 0; z-index: 10; }
 .th-src-name { font-size: 13px; font-weight: 700; color: #fff; }
@@ -759,74 +765,63 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
     var html = '';
 
-    // Source filter
     if (srcs.length > 1) {
-      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Источник</div><div class="filter-chips-row">';
-      html += '<div class="filter-chip' + (!filterSource ? ' active' : '') + '" data-fsrc="all">Все</div>';
-      srcs.forEach(function(s) {
-        html += '<div class="filter-chip' + (filterSource === s.id ? ' active' : '') + '" data-fsrc="' + s.id + '">' + esc(s.name) + '</div>';
-      });
-      html += '</div></div>';
+      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Источник</div>'
+        + '<select class="filter-select" id="fsel-src">'
+        + '<option value="">Все</option>'
+        + srcs.map(function(s){ return '<option value="' + s.id + '"' + (filterSource === s.id ? ' selected' : '') + '>' + esc(s.name) + '</option>'; }).join('')
+        + '</select></div>';
     }
 
-    // Assist filter
     if (assists.length) {
-      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Ассист</div><div class="filter-chips-row">';
-      html += '<div class="filter-chip' + (!filterAssist ? ' active' : '') + '" data-fa="all">Все</div>';
-      assists.forEach(function(a) {
-        html += '<div class="filter-chip' + (filterAssist === a ? ' active' : '') + '" data-fa="' + esc(a) + '">' + esc(a) + '</div>';
-      });
-      html += '</div></div>';
+      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Ассист</div>'
+        + '<select class="filter-select" id="fsel-assist">'
+        + '<option value="">Все</option>'
+        + assists.map(function(a){ return '<option value="' + esc(a) + '"' + (filterAssist === a ? ' selected' : '') + '>' + esc(a) + '</option>'; }).join('')
+        + '</select></div>';
     }
 
-    // Geo filter
     if (geos.length > 1) {
-      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">ГЕО</div><div class="filter-chips-row">';
-      html += '<div class="filter-chip' + (!filterGeo ? ' active' : '') + '" data-fg="all">Все</div>';
-      geos.forEach(function(g) {
-        html += '<div class="filter-chip' + (filterGeo === g ? ' active' : '') + '" data-fg="' + esc(g) + '">' + esc(g) + '</div>';
-      });
-      html += '</div></div>';
+      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">ГЕО</div>'
+        + '<select class="filter-select" id="fsel-geo">'
+        + '<option value="">Все</option>'
+        + geos.map(function(g){ return '<option value="' + esc(g) + '"' + (filterGeo === g ? ' selected' : '') + '>' + esc(g) + '</option>'; }).join('')
+        + '</select></div>';
     }
 
-    // Status filter
-    html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Статус</div><div class="filter-chips-row">';
-    html += '<div class="filter-chip' + (!filterStatus ? ' active' : '') + '" data-fs="all">Все</div>';
-    html += '<div class="filter-chip' + (filterStatus === 'pending' ? ' active' : '') + '" data-fs="pending">В процессе</div>';
-    html += '<div class="filter-chip' + (filterStatus === 'ok' ? ' active' : '') + '" data-fs="ok">Прошло</div>';
-    html += '<div class="filter-chip' + (filterStatus === 'ban' ? ' active' : '') + '" data-fs="ban">Бан</div>';
-    html += '</div></div>';
+    html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Статус</div>'
+      + '<select class="filter-select" id="fsel-status">'
+      + '<option value="">Все</option>'
+      + '<option value="pending"' + (filterStatus === 'pending' ? ' selected' : '') + '>В процессе</option>'
+      + '<option value="ok"' + (filterStatus === 'ok' ? ' selected' : '') + '>Прошло</option>'
+      + '<option value="ban"' + (filterStatus === 'ban' ? ' selected' : '') + '>Бан</option>'
+      + '</select></div>';
 
-    // Split button
-    html += '<div style="margin-left:auto;align-self:flex-end"><button class="btn btn-secondary btn-sm" id="btn-split-open">⚡ Поделить</button></div>';
+    html += '<div style="margin-left:auto;align-self:flex-end"><button class="btn btn-secondary btn-sm" id="btn-split-open">&#9889; Поделить</button></div>';
 
     bar.innerHTML = html;
 
-    bar.querySelectorAll('[data-fsrc]').forEach(function(el) {
-      el.addEventListener('click', function() {
-        var v = el.getAttribute('data-fsrc');
-        filterSource = v === 'all' ? null : parseInt(v);
-        renderFilters(dc); applyFilters(dc);
-      });
+    var selSrc = document.getElementById('fsel-src');
+    if (selSrc) selSrc.addEventListener('change', function() {
+      filterSource = this.value ? parseInt(this.value) : null;
+      applyFilters(dc);
     });
-    bar.querySelectorAll('[data-fa]').forEach(function(el) {
-      el.addEventListener('click', function() {
-        filterAssist = el.getAttribute('data-fa') === 'all' ? null : el.getAttribute('data-fa');
-        renderFilters(dc); applyFilters(dc);
-      });
+    var selAssist = document.getElementById('fsel-assist');
+    if (selAssist) selAssist.addEventListener('change', function() {
+      filterAssist = this.value || null;
+      applyFilters(dc);
     });
-    bar.querySelectorAll('[data-fg]').forEach(function(el) {
-      el.addEventListener('click', function() {
-        filterGeo = el.getAttribute('data-fg') === 'all' ? null : el.getAttribute('data-fg');
-        renderFilters(dc); applyFilters(dc);
-      });
+    var selGeo = document.getElementById('fsel-geo');
+    if (selGeo) selGeo.addEventListener('change', function() {
+      filterGeo = this.value || null;
+      applyFilters(dc);
     });
-    bar.querySelectorAll('[data-fs]').forEach(function(el) {
-      el.addEventListener('click', function() {
-        filterStatus = el.getAttribute('data-fs') === 'all' ? null : el.getAttribute('data-fs');
-        renderFilters(dc); applyFilters(dc);
-      });
+    var selStatus = document.getElementById('fsel-status');
+    if (selStatus) selStatus.addEventListener('change', function() {
+      filterStatus = this.value || null;
+      applyFilters(dc);
     });
+
     var splitBtn = document.getElementById('btn-split-open');
     if (splitBtn) splitBtn.addEventListener('click', function() { openSplitPanel(dc); });
   }
