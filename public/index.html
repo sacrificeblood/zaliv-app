@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ё<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -88,10 +88,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .camp-comment { font-size: 10px; color: #475569; flex-shrink: 0; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
 .camp-comment:hover { color: #94a3b8; }
 .camp-comment.empty { color: #2d3248; }
-/* status colors in table */
-.ze-status { font-size: 12px; flex-shrink: 0; }
-.ze.status-ok { background: #052e16 !important; }
-.ze.status-ban { background: #450a0a !important; }
+/* status in table */
+.ze-status { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 4px; flex-shrink: 0; white-space: nowrap; }
+.ze-status.s-pending { display: none; }
+.ze-status.s-ok { background: #052e16; color: #4ade80; }
+.ze-status.s-ban { background: #450a0a; color: #f87171; }
+.ze { border-left: 2px solid transparent; }
+.ze.s-ok { border-left-color: #16a34a; }
+.ze.s-ban { border-left-color: #dc2626; }
+.ze-account { font-size: 10px; color: #334155; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ze-comment { font-size: 10px; color: #1e293b; font-style: italic; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* EDIT PANEL */
+.ep-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 200; align-items: center; justify-content: center; }
+.ep-ov.open { display: flex; }
+.ep-box { background: #1a1d27; border: 1px solid #2d3248; border-radius: 12px; padding: 20px; width: 360px; max-width: 92vw; }
+.ep-neyming { font-size: 11px; font-family: monospace; color: #64748b; margin-bottom: 14px; word-break: break-all; line-height: 1.5; border-bottom: 1px solid #1e293b; padding-bottom: 12px; }
+.ep-label { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; margin-top: 12px; display: block; }
+.ep-st-row { display: flex; gap: 8px; }
+.ep-st-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 2px solid #2d3248; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; transition: all .15s; background: #0f1117; color: #475569; }
+.ep-st-btn:hover { border-color: #475569; color: #e2e8f0; }
+.ep-st-btn.sel-pending { border-color: #eab308; color: #eab308; background: #1c1a05; }
+.ep-st-btn.sel-ok { border-color: #16a34a; color: #4ade80; background: #052e16; }
+.ep-st-btn.sel-ban { border-color: #dc2626; color: #f87171; background: #450a0a; }
+.ep-inp { width: 100%; background: #0f1117; border: 1px solid #2d3248; border-radius: 6px; padding: 7px 10px; color: #e2e8f0; font-size: 13px; outline: none; font-family: inherit; }
+.ep-inp:focus { border-color: #6d28d9; }
+.ep-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
 .empty-msg { padding: 20px; text-align: center; color: #334155; font-size: 12px; }
 
 /* TABLE PAGE */
@@ -241,6 +262,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- EDIT PANEL -->
+<div class="ep-ov" id="ep-ov">
+  <div class="ep-box">
+    <div class="ep-neyming" id="ep-neyming"></div>
+    <span class="ep-label">Статус</span>
+    <div class="ep-st-row">
+      <button class="ep-st-btn" id="ep-pending">В процессе</button>
+      <button class="ep-st-btn" id="ep-ok">Прошло</button>
+      <button class="ep-st-btn" id="ep-ban">Бан</button>
+    </div>
+    <span class="ep-label">Аккаунт</span>
+    <input type="text" class="ep-inp" id="ep-account" placeholder="название аккаунта">
+    <span class="ep-label">Комментарий</span>
+    <input type="text" class="ep-inp" id="ep-comment" placeholder="заметка...">
+    <div class="ep-btns">
+      <button class="btn btn-secondary" id="ep-cancel">Отмена</button>
+      <button class="btn btn-primary" id="ep-save">Сохранить</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -696,11 +738,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           var c = cols[s.id][i];
           html += '<td><div class="cell-inner">';
           if (c) {
-            var stCls = c.status === 'ok' ? ' status-ok' : c.status === 'ban' ? ' status-ban' : '';
-            html += '<div class="ze' + stCls + '" data-n="' + esc(c.neyming) + '" title="' + esc(c.account || '') + (c.comment ? ' — ' + esc(c.comment) : '') + '">'
+            var st = c.status || 'pending';
+            html += '<div class="ze s-' + st + '" data-camp-id="' + c.id + '">'
               + '<div class="ze-plt ' + (c.platform === 'ios' ? 'ios' : 'and') + '">' + (c.platform === 'ios' ? 'I' : 'A') + '</div>'
+              + '<div style="flex:1;min-width:0">'
               + '<div class="ze-text">' + esc(c.neyming) + '</div>'
-              + '<span class="ze-status">' + statusEmoji(c.status || 'pending') + '</span>'
+              + (c.account ? '<div class="ze-account">' + esc(c.account) + '</div>' : '')
+              + (c.comment ? '<div class="ze-comment">' + esc(c.comment) + '</div>' : '')
+              + '</div>'
+              + '<span class="ze-status s-' + st + '">' + (st === 'ok' ? 'Прошло' : st === 'ban' ? 'Бан' : '') + '</span>'
               + '</div>';
           }
           html += '</div></td>';
@@ -711,11 +757,60 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       wrap.innerHTML = html;
       wrap.querySelectorAll('.ze').forEach(function (el) {
         el.addEventListener('click', function () {
-          navigator.clipboard.writeText(el.getAttribute('data-n')).then(function () { toast('Скопировано', 'ok'); });
+          var cid = parseInt(el.getAttribute('data-camp-id'));
+          openEditPanel(cid, dateCamps);
         });
       });
     } catch (e) { wrap.innerHTML = '<div class="no-data">Ошибка загрузки</div>'; }
   }
+
+  // EDIT PANEL
+  var epCampId = null;
+  var epStatus = 'pending';
+  var epDateCamps = [];
+
+  function openEditPanel(id, dateCamps) {
+    epCampId = id;
+    epDateCamps = dateCamps;
+    var c = dateCamps.find(function(x) { return x.id === id; });
+    if (!c) return;
+    epStatus = c.status || 'pending';
+    document.getElementById('ep-neyming').textContent = c.neyming;
+    document.getElementById('ep-account').value = c.account || '';
+    document.getElementById('ep-comment').value = c.comment || '';
+    updateEpButtons();
+    document.getElementById('ep-ov').classList.add('open');
+    setTimeout(function() { document.getElementById('ep-account').focus(); }, 60);
+  }
+
+  function updateEpButtons() {
+    ['pending','ok','ban'].forEach(function(s) {
+      var btn = document.getElementById('ep-' + s);
+      btn.className = 'ep-st-btn' + (epStatus === s ? ' sel-' + s : '');
+    });
+  }
+
+  document.getElementById('ep-pending').addEventListener('click', function() { epStatus='pending'; updateEpButtons(); });
+  document.getElementById('ep-ok').addEventListener('click', function() { epStatus='ok'; updateEpButtons(); });
+  document.getElementById('ep-ban').addEventListener('click', function() { epStatus='ban'; updateEpButtons(); });
+  document.getElementById('ep-cancel').addEventListener('click', function() { document.getElementById('ep-ov').classList.remove('open'); });
+
+  document.getElementById('ep-save').addEventListener('click', async function() {
+    var account = document.getElementById('ep-account').value.trim();
+    var comment = document.getElementById('ep-comment').value.trim();
+    try {
+      var saved = await req('/api/campaigns/' + epCampId, 'PATCH', { status: epStatus, account: account, comment: comment });
+      // update in campaigns array
+      var i = campaigns.findIndex(function(x) { return x.id === epCampId; });
+      if (i !== -1) campaigns[i] = Object.assign(campaigns[i], saved);
+      // update in dateCamps
+      var j = epDateCamps.findIndex(function(x) { return x.id === epCampId; });
+      if (j !== -1) epDateCamps[j] = Object.assign(epDateCamps[j], saved);
+      document.getElementById('ep-ov').classList.remove('open');
+      loadTableDate(activeDateTab);
+      toast('Сохранено', 'ok');
+    } catch(e) { toast('Ошибка', 'err'); }
+  });
 
   // INIT
   async function init() {
