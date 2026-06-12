@@ -454,11 +454,23 @@ function buildNeyming(geo, creative, assistant, platform) {
 function parseCount(raw) {
   raw = raw.trim();
   // "3IOS" or "3ios"
-  var iosOnly = raw.match(/^(\d+)\s*ios$/i);
-  if (iosOnly) return { android: 0, ios: parseInt(iosOnly[1]) };
-  // "2+3IOS" or "2 + 3 IOS" or just "2"
-  var both = raw.match(/^(\d+)(?:\s*\+\s*(\d+)\s*(?:ios)?)?$/i);
-  if (both) return { android: parseInt(both[1] || 0), ios: parseInt(both[2] || 0) };
+  // simple manual parse - no complex regex
+  var upper = raw.toUpperCase().replace(/\s/g, '');
+  // "2IOS"
+  if (/^\d+IOS$/.test(upper)) {
+    return { android: 0, ios: parseInt(upper) };
+  }
+  // "2+3IOS"
+  if (upper.indexOf('+') !== -1) {
+    var parts = upper.split('+');
+    var left = parseInt(parts[0]) || 0;
+    var right = parseInt(parts[1]) || 0;
+    return { android: left, ios: right };
+  }
+  // just "2"
+  if (/^\d+$/.test(upper)) {
+    return { android: parseInt(upper), ios: 0 };
+  }
   return null;
 }
 
