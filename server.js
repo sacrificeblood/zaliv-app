@@ -34,8 +34,15 @@ async function initDB() {
         neyming TEXT NOT NULL,
         plan_date DATE NOT NULL DEFAULT CURRENT_DATE,
         position INTEGER DEFAULT 0,
+        status VARCHAR(20) DEFAULT 'pending',
+        comment TEXT DEFAULT '',
+        account VARCHAR(255) DEFAULT '',
         created_at TIMESTAMP DEFAULT NOW()
       );
+      -- migrate existing tables
+      ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'pending';
+      ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS comment TEXT DEFAULT '';
+      ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS account VARCHAR(255) DEFAULT '';
     `);
     console.log('DB initialized');
   } finally {
@@ -111,6 +118,16 @@ app.delete('/api/campaigns/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM campaigns WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
+  } catch(e) { res.status(500).json({error: e.message}); }
+});
+
+app.patch('/api/campaigns/:id', async (req, res) => {
+  try {
+    const { status, comment, account } = req.body;
+    const r = await pool.query(
+      'UPDATE campaigns SET status=$1, comment=$2, account=$3 WHERE id=$4 RETURNING *',
+      [status || 'pending', comment || '', account || '', req.params.id]);
+    res.json(r.rows[0]);
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
