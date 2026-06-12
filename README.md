@@ -3,7 +3,7 @@
 ## Деплой за 5 минут
 
 ### 1. Загрузи код на GitHub
-
+ 
 ```bash
 git init
 git add .
