@@ -9,7 +9,7 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; font-size: 13px; }
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-thumb { background: #2d3248; border-radius: 3px; }
-.hdr { background: #1a1d27; border-bottom: 1px solid #2d3248; height: 52px; display: flex; align-items: center; padding: 0 20px; gap: 0; position: sticky; top: 0; z-index: 100; }
+.hdr { background: #1a1d27; border-bottom: 1px solid #2d3248; height: 52px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 100; }
 .hdr-logo { font-size: 15px; font-weight: 800; color: #fff; margin-right: 24px; }
 .tabs { display: flex; height: 100%; align-items: flex-end; gap: 2px; }
 .tab { padding: 0 18px; height: 38px; display: flex; align-items: center; font-size: 13px; font-weight: 500; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; user-select: none; }
@@ -19,6 +19,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .save-st { font-size: 11px; color: #475569; }
 .page { display: none; height: calc(100vh - 52px); overflow: hidden; }
 .page.active { display: flex; flex-direction: column; }
+
+/* PLAN PAGE */
 .plan-layout { display: flex; flex: 1; overflow: hidden; }
 .src-panel { width: 220px; min-width: 220px; background: #1a1d27; border-right: 1px solid #2d3248; display: flex; flex-direction: column; overflow: hidden; }
 .src-panel-head { padding: 12px 12px 6px; display: flex; align-items: center; justify-content: space-between; }
@@ -33,25 +35,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .src-item:hover .src-item-del { opacity: 1; }
 .sp-footer { padding: 8px 6px; border-top: 1px solid #2d3248; }
 .plan-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.add-form { background: #141720; border-bottom: 1px solid #2d3248; padding: 12px 16px; flex-shrink: 0; }
+
+/* FORM */
+.add-form { background: #141720; border-bottom: 1px solid #2d3248; padding: 14px 16px; flex-shrink: 0; }
 .add-form-title { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
-.form-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
-.fg { display: flex; flex-direction: column; gap: 3px; }
+.form-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.fg { display: flex; flex-direction: column; gap: 4px; }
 .fg label { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-.fg input, .fg select { background: #0f1117; border: 1px solid #2d3248; border-radius: 6px; padding: 6px 9px; color: #e2e8f0; font-size: 12px; outline: none; font-family: inherit; transition: border-color .15s; }
+.fg input, .fg select { background: #0f1117; border: 1px solid #2d3248; border-radius: 6px; padding: 7px 10px; color: #e2e8f0; font-size: 13px; outline: none; font-family: inherit; transition: border-color .15s; }
 .fg input:focus, .fg select:focus { border-color: #6d28d9; }
-.fg input::placeholder { color: #2d3248; }
-.fg-geo { width: 75px; }
-.fg-creative { width: 130px; }
-.fg-assist { width: 100px; }
-.fg-count { width: 100px; }
-.fg-source { width: 160px; }
+.fg input::placeholder { color: #334155; }
+.fg-input { width: 220px; }
+.fg-creative { width: 150px; }
+.fg-assist { width: 110px; }
+.fg-src-and { width: 170px; }
+.fg-src-ios { width: 170px; }
 .fg-date { width: 130px; }
-.preview-area { margin-top: 8px; display: flex; gap: 5px; flex-wrap: wrap; }
+.form-hint { font-size: 11px; color: #334155; margin-top: 6px; }
+.form-hint span { color: #6d28d9; font-family: monospace; }
+
+.preview-area { margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap; }
 .pchip { font-size: 11px; font-family: monospace; padding: 3px 8px; border-radius: 5px; cursor: pointer; border: 1px solid transparent; }
 .pchip.and { background: #052e16; color: #4ade80; border-color: #14532d; }
 .pchip.ios { background: #0c1a3d; color: #60a5fa; border-color: #1e3a5f; }
 .pchip:hover { opacity: .7; }
+
+/* CAMPS */
 .plan-camps { flex: 1; overflow: auto; padding: 12px 16px; }
 .plan-src-block { margin-bottom: 20px; }
 .psb-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #1e293b; }
@@ -61,7 +70,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .ic-btn { background: transparent; border: 1px solid #2d3248; color: #64748b; padding: 3px 8px; border-radius: 5px; font-size: 11px; cursor: pointer; }
 .ic-btn:hover { background: #252836; color: #e2e8f0; }
 .plt-group { margin-bottom: 6px; }
-.plt-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; padding: 2px 0; color: #475569; }
+.plt-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; padding: 2px 0; }
 .plt-label.and { color: #34d399; }
 .plt-label.ios { color: #60a5fa; }
 .camp-row { display: flex; align-items: center; gap: 6px; padding: 3px 4px; border-radius: 5px; }
@@ -72,6 +81,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .camp-del-btn { opacity: 0; color: #ef4444; cursor: pointer; font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
 .camp-row:hover .camp-del-btn { opacity: 1; }
 .empty-msg { padding: 20px; text-align: center; color: #334155; font-size: 12px; }
+
+/* TABLE PAGE */
 .tbl-toolbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #2d3248; background: #1a1d27; flex-shrink: 0; flex-wrap: wrap; }
 .tbl-title { font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
 .date-tabs { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
@@ -98,6 +109,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .ze-text { font-size: 11px; font-family: monospace; color: #94a3b8; flex: 1; line-height: 1.4; word-break: break-all; }
 .ze:hover .ze-text { color: #fff; }
 .no-data { padding: 60px; text-align: center; color: #334155; font-size: 13px; }
+
+/* MODAL */
 .modal-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 200; align-items: center; justify-content: center; }
 .modal-ov.open { display: flex; }
 .modal { background: #1a1d27; border: 1px solid #2d3248; border-radius: 12px; padding: 22px; width: 380px; max-width: 92vw; }
@@ -132,7 +145,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <span class="save-st" id="save-st"></span>
 </div>
 
-<!-- PAGE 1: СОЗДАНИЕ ПЛАНА -->
+<!-- PAGE 1 -->
 <div class="page active" id="page-plan">
   <div class="plan-layout">
     <div class="src-panel">
@@ -145,38 +158,40 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <button class="btn btn-secondary btn-full btn-sm" id="btn-src-bot">+ Добавить источник</button>
       </div>
     </div>
-
     <div class="plan-main">
       <div class="add-form">
         <div class="add-form-title">Добавить кампании</div>
         <div class="form-row">
-          <div class="fg fg-geo">
-            <label>ГЕО</label>
-            <input type="text" id="fg-geo" placeholder="CA, UK...">
+          <div class="fg fg-input">
+            <label>ГЕО x Android x iOS</label>
+            <input type="text" id="fg-input" placeholder="CAx2 или CAx2x1">
           </div>
           <div class="fg fg-creative">
             <label>Крео</label>
-            <input type="text" id="fg-creative" placeholder="mrbizness...">
+            <input type="text" id="fg-creative" placeholder="mrbizness, nalog...">
           </div>
           <div class="fg fg-assist">
             <label>Ник (опц.)</label>
             <input type="text" id="fg-assist" placeholder="burmalda">
           </div>
-          <div class="fg fg-count">
-            <label>Кол-во</label>
-            <input type="text" id="fg-count" placeholder="2 или 2+3IOS">
+          <div class="fg fg-src-and">
+            <label>Источник Android</label>
+            <select id="fg-src-and"></select>
           </div>
-          <div class="fg fg-source">
-            <label>Источник</label>
-            <select id="fg-source"></select>
+          <div class="fg fg-src-ios">
+            <label>Источник iOS</label>
+            <select id="fg-src-ios"></select>
           </div>
           <div class="fg fg-date">
-            <label>Дата плана</label>
+            <label>Дата</label>
             <input type="date" id="fg-date">
           </div>
           <div class="fg" style="justify-content:flex-end">
             <button class="btn btn-primary" id="btn-add">Добавить</button>
           </div>
+        </div>
+        <div class="form-hint">
+          Формат: <span>CAx2</span> = 2 Android на CA &nbsp;|&nbsp; <span>CAx2x1</span> = 2 Android + 1 iOS на CA &nbsp;|&nbsp; <span>CAx0x3</span> = 3 iOS на CA
         </div>
         <div class="preview-area" id="preview-area"></div>
       </div>
@@ -187,18 +202,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   </div>
 </div>
 
-<!-- PAGE 2: ТАБЛИЦА -->
+<!-- PAGE 2 -->
 <div class="page" id="page-table">
   <div class="tbl-toolbar">
     <span class="tbl-title">Таблица залива</span>
     <div class="date-tabs" id="date-tabs"></div>
   </div>
   <div class="tbl-wrap" id="tbl-wrap">
-    <div class="no-data">Добавь кампании в плане чтобы увидеть таблицу</div>
+    <div class="no-data">Добавь кампании чтобы увидеть таблицу</div>
   </div>
 </div>
 
-<!-- MODAL: ИСТОЧНИК -->
+<!-- MODAL -->
 <div class="modal-ov" id="m-src">
   <div class="modal">
     <h3 id="m-src-title">Новый источник</h3>
@@ -227,14 +242,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   var toastTimer = null;
 
   function esc(s) {
-    return String(s || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
-
   function toast(msg, type) {
     var el = document.getElementById('toast');
     el.textContent = msg;
@@ -242,47 +251,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2500);
   }
-
   function setSt(msg) {
     var el = document.getElementById('save-st');
     if (el) el.textContent = msg;
   }
-
   function kievToday() {
     var now = new Date();
     var kyiv = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Kiev' }));
-    var y = kyiv.getFullYear();
-    var m = String(kyiv.getMonth() + 1).padStart(2, '0');
-    var d = String(kyiv.getDate()).padStart(2, '0');
-    return y + '-' + m + '-' + d;
+    return kyiv.getFullYear() + '-' + String(kyiv.getMonth()+1).padStart(2,'0') + '-' + String(kyiv.getDate()).padStart(2,'0');
   }
-
   function fmtDate(d) {
     if (!d) return '';
-    var s = String(d).slice(0, 10);
+    var s = String(d).slice(0,10);
     var p = s.split('-');
     var label = p[2] + '.' + p[1] + '.' + p[0];
     if (s === kievToday()) return label + ' (сегодня)';
     return label;
   }
-
   async function req(url, method, body) {
     var opts = { method: method || 'GET', headers: { 'Content-Type': 'application/json' } };
     if (body) opts.body = JSON.stringify(body);
     var r = await fetch(url, opts);
     if (!r.ok) throw new Error(await r.text());
-    if ((method || 'GET') === 'DELETE') return null;
+    if ((method||'GET') === 'DELETE') return null;
     return r.json();
   }
 
-  // ---------- TABS ----------
+  // TABS
   document.getElementById('tab-plan').addEventListener('click', function () {
     document.getElementById('tab-plan').classList.add('active');
     document.getElementById('tab-table').classList.remove('active');
     document.getElementById('page-plan').classList.add('active');
     document.getElementById('page-table').classList.remove('active');
   });
-
   document.getElementById('tab-table').addEventListener('click', function () {
     document.getElementById('tab-table').classList.add('active');
     document.getElementById('tab-plan').classList.remove('active');
@@ -291,10 +292,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     loadTablePage();
   });
 
-  // ---------- MODAL ----------
+  // MODAL
   function openModal() { document.getElementById('m-src').classList.add('open'); }
   function closeModal() { document.getElementById('m-src').classList.remove('open'); }
-
   document.getElementById('btn-cancel-src').addEventListener('click', closeModal);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
 
@@ -306,7 +306,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     openModal();
     setTimeout(function () { document.getElementById('inp-src-name').focus(); }, 60);
   }
-
   function openEditSrc(id) {
     var s = sources.find(function (x) { return x.id === id; });
     if (!s) return;
@@ -317,7 +316,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     openModal();
     setTimeout(function () { document.getElementById('inp-src-name').focus(); }, 60);
   }
-
   document.getElementById('btn-src-top').addEventListener('click', openNewSrc);
   document.getElementById('btn-src-bot').addEventListener('click', openNewSrc);
 
@@ -336,7 +334,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       }
       closeModal();
       renderSrcPanel();
-      renderSrcSelect();
+      renderSrcSelects();
       toast('Сохранено', 'ok');
     } catch (e) { toast('Ошибка: ' + e.message, 'err'); }
   });
@@ -349,12 +347,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       campaigns = campaigns.filter(function (c) { return c.source_id !== id; });
       if (selSrcId === id) selSrcId = null;
       renderSrcPanel();
-      renderSrcSelect();
+      renderSrcSelects();
       renderPlanCamps();
     } catch (e) { toast('Ошибка', 'err'); }
   }
 
-  // ---------- SOURCES ----------
   function renderSrcPanel() {
     var list = document.getElementById('src-list');
     var html = '';
@@ -367,7 +364,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         + '</div>';
     });
     list.innerHTML = html;
-
     list.querySelectorAll('.src-item').forEach(function (item) {
       item.addEventListener('click', function (e) {
         var del = e.target.getAttribute('data-del');
@@ -380,14 +376,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     });
   }
 
-  function renderSrcSelect() {
-    var sel = document.getElementById('fg-source');
-    sel.innerHTML = sources.map(function (s) {
+  function renderSrcSelects() {
+    var opts = sources.map(function (s) {
       return '<option value="' + s.id + '">' + esc(s.name) + '</option>';
     }).join('');
+    document.getElementById('fg-src-and').innerHTML = opts;
+    document.getElementById('fg-src-ios').innerHTML = opts;
   }
 
-  // ---------- NEYMING ----------
+  // NEYMING
   function buildN(geo, creative, asst, platform) {
     var parts = [geo, creative, 'm1non'];
     if (asst) parts.push(asst);
@@ -397,100 +394,92 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     return parts.join('x');
   }
 
-  function parseCnt(raw) {
-    var up = (raw || '').toUpperCase().replace(/\s/g, '');
-    if (!up) return null;
-    if (up.indexOf('+') !== -1) {
-      var p = up.split('+');
-      return { android: parseInt(p[0]) || 0, ios: parseInt(p[1]) || 0 };
-    }
-    if (up.length > 3 && up.slice(-3) === 'IOS' && /^\d+IOS$/.test(up)) {
-      return { android: 0, ios: parseInt(up) };
-    }
-    if (/^\d+$/.test(up)) return { android: parseInt(up), ios: 0 };
-    return null;
+  // Parse "CAx2" or "CAx2x1"
+  function parseInput(raw) {
+    var s = raw.trim();
+    if (!s) return null;
+    var parts = s.split('x');
+    if (parts.length < 2) return null;
+    var geo = parts[0].toUpperCase();
+    var android = parseInt(parts[1]) || 0;
+    var ios = parts[2] ? (parseInt(parts[2]) || 0) : 0;
+    if (!geo) return null;
+    return { geo: geo, android: android, ios: ios };
   }
 
   function updatePreview() {
-    var geo = document.getElementById('fg-geo').value.trim();
+    var raw = document.getElementById('fg-input').value;
     var cr = document.getElementById('fg-creative').value.trim();
     var as = document.getElementById('fg-assist').value.trim();
-    var raw = document.getElementById('fg-count').value.trim();
     var area = document.getElementById('preview-area');
-    if (!geo || !cr || !raw) { area.innerHTML = ''; return; }
-    var cnt = parseCnt(raw);
-    if (!cnt) { area.innerHTML = ''; return; }
+    if (!raw || !cr) { area.innerHTML = ''; return; }
+    var parsed = parseInput(raw);
+    if (!parsed) { area.innerHTML = ''; return; }
     var html = '';
-    for (var i = 0; i < cnt.android; i++) {
-      var n = buildN(geo, cr, as, 'android');
+    for (var i = 0; i < parsed.android; i++) {
+      var n = buildN(parsed.geo, cr, as, 'android');
       html += '<span class="pchip and" data-n="' + esc(n) + '">A: ' + esc(n) + '</span>';
     }
-    for (var i = 0; i < cnt.ios; i++) {
-      var n = buildN(geo, cr, as, 'ios');
+    for (var i = 0; i < parsed.ios; i++) {
+      var n = buildN(parsed.geo, cr, as, 'ios');
       html += '<span class="pchip ios" data-n="' + esc(n) + '">I: ' + esc(n) + '</span>';
     }
     area.innerHTML = html;
     area.querySelectorAll('.pchip').forEach(function (chip) {
       chip.addEventListener('click', function () {
-        navigator.clipboard.writeText(chip.getAttribute('data-n'))
-          .then(function () { toast('Скопировано', 'ok'); });
+        navigator.clipboard.writeText(chip.getAttribute('data-n')).then(function () { toast('Скопировано', 'ok'); });
       });
     });
   }
 
-  ['fg-geo', 'fg-creative', 'fg-assist', 'fg-count'].forEach(function (id) {
+  ['fg-input', 'fg-creative', 'fg-assist'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', updatePreview);
   });
-
-  document.getElementById('fg-count').addEventListener('keydown', function (e) {
+  document.getElementById('fg-input').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') document.getElementById('btn-add').click();
   });
 
-  // ---------- ADD ----------
+  // ADD
   document.getElementById('btn-add').addEventListener('click', async function () {
-    var geo = document.getElementById('fg-geo').value.trim();
+    var raw = document.getElementById('fg-input').value;
     var cr = document.getElementById('fg-creative').value.trim();
     var as = document.getElementById('fg-assist').value.trim();
-    var raw = document.getElementById('fg-count').value.trim();
-    var srcId = parseInt(document.getElementById('fg-source').value);
+    var srcAndId = parseInt(document.getElementById('fg-src-and').value);
+    var srcIosId = parseInt(document.getElementById('fg-src-ios').value);
     var plan_date = document.getElementById('fg-date').value || kievToday();
 
-    if (!geo || !cr) { toast('Заполни ГЕО и крео', 'err'); return; }
-    if (!raw) { toast('Заполни количество', 'err'); return; }
-    if (!srcId) { toast('Создай источник сначала', 'err'); return; }
-    var cnt = parseCnt(raw);
-    if (!cnt || (cnt.android === 0 && cnt.ios === 0)) { toast('Формат: 2 или 2+3IOS или 3IOS', 'err'); return; }
+    if (!raw) { toast('Заполни поле ГЕО x Android x iOS', 'err'); return; }
+    if (!cr) { toast('Заполни крео', 'err'); return; }
+    if (!srcAndId) { toast('Создай источник сначала', 'err'); return; }
+
+    var parsed = parseInput(raw);
+    if (!parsed) { toast('Формат: CAx2 или CAx2x1', 'err'); return; }
+    if (parsed.android === 0 && parsed.ios === 0) { toast('Укажи хотя бы одну кампанию', 'err'); return; }
 
     var toAdd = [];
-    for (var i = 0; i < cnt.android; i++) {
-      var n = buildN(geo, cr, as, 'android');
-      var dup = campaigns.some(function (c) { return c.neyming === n && String(c.plan_date).slice(0, 10) === plan_date; });
-      if (!dup) toAdd.push({ platform: 'android', neyming: n });
+    for (var i = 0; i < parsed.android; i++) {
+      var n = buildN(parsed.geo, cr, as, 'android');
+      toAdd.push({ source_id: srcAndId, geo: parsed.geo, creative: cr, assistant: as, platform: 'android', neyming: n });
     }
-    for (var i = 0; i < cnt.ios; i++) {
-      var n = buildN(geo, cr, as, 'ios');
-      var dup = campaigns.some(function (c) { return c.neyming === n && String(c.plan_date).slice(0, 10) === plan_date; });
-      if (!dup) toAdd.push({ platform: 'ios', neyming: n });
+    for (var i = 0; i < parsed.ios; i++) {
+      var n = buildN(parsed.geo, cr, as, 'ios');
+      toAdd.push({ source_id: srcIosId, geo: parsed.geo, creative: cr, assistant: as, platform: 'ios', neyming: n });
     }
-    if (!toAdd.length) { toast('Все нейминги — дубликаты', 'err'); return; }
 
     setSt('Сохранение...');
     try {
       for (var j = 0; j < toAdd.length; j++) {
-        var saved = await req('/api/campaigns', 'POST', {
-          source_id: srcId, geo: geo, creative: cr, assistant: as,
-          platform: toAdd[j].platform, neyming: toAdd[j].neyming, plan_date: plan_date
-        });
+        var saved = await req('/api/campaigns', 'POST', Object.assign({ plan_date: plan_date }, toAdd[j]));
         campaigns.push(saved);
       }
       setSt('Сохранено ✓');
       setTimeout(function () { setSt(''); }, 2000);
-      document.getElementById('fg-count').value = '';
+      document.getElementById('fg-input').value = '';
       document.getElementById('preview-area').innerHTML = '';
       renderSrcPanel();
       renderPlanCamps();
       toast('Добавлено ' + toAdd.length + ' кампаний', 'ok');
-    } catch (e) { toast('Ошибка сохранения', 'err'); setSt(''); }
+    } catch (e) { toast('Ошибка: ' + e.message, 'err'); setSt(''); }
   });
 
   async function delCamp(id) {
@@ -502,12 +491,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     } catch (e) { toast('Ошибка', 'err'); }
   }
 
-  // ---------- RENDER CAMPS ----------
   function renderPlanCamps() {
     var area = document.getElementById('plan-camps');
     var shown = selSrcId ? sources.filter(function (s) { return s.id === selSrcId; }) : sources;
     if (!sources.length) { area.innerHTML = '<div class="empty-msg">Добавь источник чтобы начать</div>'; return; }
-
     var html = '';
     shown.forEach(function (src) {
       var sc = campaigns.filter(function (c) { return c.source_id === src.id; });
@@ -535,7 +522,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       html += '</div>';
     });
     area.innerHTML = html;
-
     area.querySelectorAll('[data-copy-src]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var sid = parseInt(btn.getAttribute('data-copy-src'));
@@ -564,7 +550,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       + '</div>';
   }
 
-  // ---------- TABLE PAGE ----------
+  // TABLE PAGE
   async function loadTablePage() {
     try {
       var dates = await req('/api/dates');
@@ -602,22 +588,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     try {
       var dc = await req('/api/campaigns?date=' + date);
       if (!dc.length) { wrap.innerHTML = '<div class="no-data">Нет кампаний за ' + fmtDate(date) + '</div>'; return; }
-
       var srcIds = [];
       dc.forEach(function (c) { if (c.source_id && srcIds.indexOf(c.source_id) === -1) srcIds.push(c.source_id); });
       var shown = sources.filter(function (s) { return srcIds.indexOf(s.id) !== -1; });
       if (!shown.length) shown = srcIds.map(function (id) { return { id: id, name: 'Источник ' + id, key_link: '' }; });
-
       var cols = {};
       shown.forEach(function (s) {
         var and = dc.filter(function (c) { return c.source_id === s.id && c.platform === 'android'; });
         var ios = dc.filter(function (c) { return c.source_id === s.id && c.platform === 'ios'; });
         cols[s.id] = and.concat(ios);
       });
-
       var maxR = 0;
       shown.forEach(function (s) { if (cols[s.id].length > maxR) maxR = cols[s.id].length; });
-
       var html = '<table class="ztbl"><thead><tr><th class="th-num"></th>';
       shown.forEach(function (s) {
         html += '<th><div class="th-inner">'
@@ -627,9 +609,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           + '</div></th>';
       });
       html += '</tr></thead><tbody>';
-
       for (var i = 0; i < maxR; i++) {
-        html += '<tr><td class="td-num">' + (i + 1) + '</td>';
+        html += '<tr><td class="td-num">' + (i+1) + '</td>';
         shown.forEach(function (s) {
           var c = cols[s.id][i];
           html += '<td><div class="cell-inner">';
@@ -645,7 +626,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       }
       html += '</tbody></table>';
       wrap.innerHTML = html;
-
       wrap.querySelectorAll('.ze').forEach(function (el) {
         el.addEventListener('click', function () {
           navigator.clipboard.writeText(el.getAttribute('data-n')).then(function () { toast('Скопировано', 'ok'); });
@@ -654,14 +634,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     } catch (e) { wrap.innerHTML = '<div class="no-data">Ошибка загрузки</div>'; }
   }
 
-  // ---------- INIT ----------
+  // INIT
   async function init() {
     document.getElementById('fg-date').value = kievToday();
     try {
       sources = await req('/api/sources');
       campaigns = await req('/api/campaigns');
       renderSrcPanel();
-      renderSrcSelect();
+      renderSrcSelects();
       renderPlanCamps();
     } catch (e) { toast('Ошибка подключения к серверу', 'err'); }
   }
