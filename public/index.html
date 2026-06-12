@@ -119,12 +119,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .dtab:hover { border-color: #16a34a; color: #4ade80; }
 .dtab.today { border-color: #14532d; color: #4ade80; }
 .dtab.active { background: #052e16; border-color: #16a34a; color: #bbf7d0; font-weight: 700; }
-.tbl-filters { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid #1e293b; background: #0f1117; flex-shrink: 0; flex-wrap: wrap; }
-.tbl-filters-label { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; flex-shrink: 0; }
+.tbl-filters { display: flex; align-items: flex-start; gap: 16px; padding: 10px 16px; border-bottom: 1px solid #1e293b; background: #0f1117; flex-shrink: 0; flex-wrap: wrap; }
+.tbl-filters-group { display: flex; flex-direction: column; gap: 5px; }
+.tbl-filters-label { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.filter-chips-row { display: flex; gap: 5px; flex-wrap: wrap; }
 .filter-chip { padding: 3px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; border: 1px solid #2d3248; color: #64748b; transition: all .12s; white-space: nowrap; }
 .filter-chip:hover { border-color: #475569; color: #e2e8f0; }
 .filter-chip.active { background: #1a1d27; border-color: #16a34a; color: #4ade80; font-weight: 600; }
-.filter-sep { width: 1px; height: 18px; background: #2d3248; flex-shrink: 0; margin: 0 4px; }
+.filter-sep { display: none; }
 .no-data { padding: 60px; text-align: center; color: #334155; font-size: 13px; }
 
 /* NEW TABLE STYLES */
@@ -759,43 +761,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
     // Source filter
     if (srcs.length > 1) {
-      html += '<span class="tbl-filters-label">Источник:</span>';
+      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Источник</div><div class="filter-chips-row">';
       html += '<div class="filter-chip' + (!filterSource ? ' active' : '') + '" data-fsrc="all">Все</div>';
       srcs.forEach(function(s) {
         html += '<div class="filter-chip' + (filterSource === s.id ? ' active' : '') + '" data-fsrc="' + s.id + '">' + esc(s.name) + '</div>';
       });
-      html += '<div class="filter-sep"></div>';
+      html += '</div></div>';
     }
 
     // Assist filter
     if (assists.length) {
-      html += '<span class="tbl-filters-label">Ассист:</span>';
+      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Ассист</div><div class="filter-chips-row">';
       html += '<div class="filter-chip' + (!filterAssist ? ' active' : '') + '" data-fa="all">Все</div>';
       assists.forEach(function(a) {
         html += '<div class="filter-chip' + (filterAssist === a ? ' active' : '') + '" data-fa="' + esc(a) + '">' + esc(a) + '</div>';
       });
-      html += '<div class="filter-sep"></div>';
+      html += '</div></div>';
     }
 
     // Geo filter
     if (geos.length > 1) {
-      html += '<span class="tbl-filters-label">ГЕО:</span>';
+      html += '<div class="tbl-filters-group"><div class="tbl-filters-label">ГЕО</div><div class="filter-chips-row">';
       html += '<div class="filter-chip' + (!filterGeo ? ' active' : '') + '" data-fg="all">Все</div>';
       geos.forEach(function(g) {
         html += '<div class="filter-chip' + (filterGeo === g ? ' active' : '') + '" data-fg="' + esc(g) + '">' + esc(g) + '</div>';
       });
-      html += '<div class="filter-sep"></div>';
+      html += '</div></div>';
     }
 
     // Status filter
-    html += '<span class="tbl-filters-label">Статус:</span>';
+    html += '<div class="tbl-filters-group"><div class="tbl-filters-label">Статус</div><div class="filter-chips-row">';
     html += '<div class="filter-chip' + (!filterStatus ? ' active' : '') + '" data-fs="all">Все</div>';
     html += '<div class="filter-chip' + (filterStatus === 'pending' ? ' active' : '') + '" data-fs="pending">В процессе</div>';
     html += '<div class="filter-chip' + (filterStatus === 'ok' ? ' active' : '') + '" data-fs="ok">Прошло</div>';
     html += '<div class="filter-chip' + (filterStatus === 'ban' ? ' active' : '') + '" data-fs="ban">Бан</div>';
+    html += '</div></div>';
 
     // Split button
-    html += '<div style="margin-left:auto"><button class="btn btn-secondary btn-sm" id="btn-split-open">⚡ Поделить</button></div>';
+    html += '<div style="margin-left:auto;align-self:flex-end"><button class="btn btn-secondary btn-sm" id="btn-split-open">⚡ Поделить</button></div>';
 
     bar.innerHTML = html;
 
@@ -871,6 +874,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   function renderTableData(dc) {
     var wrap = document.getElementById('tbl-wrap');
     if (!dc.length) { wrap.innerHTML = '<div class="no-data">Нет кампаний по выбранным фильтрам</div>'; return; }
+    var assistColors = ['#60a5fa','#eab308','#f87171','#a78bfa','#fb923c','#34d399'];
+    var assistColorMap = {};
+    var assistIdx = 0;
       var srcIds = [];
       dc.forEach(function (c) { if (c.source_id && srcIds.indexOf(c.source_id) === -1) srcIds.push(c.source_id); });
       var shown = sources.filter(function (s) { return srcIds.indexOf(s.id) !== -1; });
@@ -924,7 +930,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
               + '</div></td>';
             // Аккаунт
             html += '<td class="ztbl-td ztbl-td-edit" data-open-ep="' + c.id + '">'
-              + (c.assigned_to ? '<div style="font-size:10px;color:#16a34a;font-weight:700;margin-bottom:2px">' + esc(c.assigned_to) + '</div>' : '')
+              + (c.assigned_to ? '<div style="font-size:10px;color:' + (function(a){ if(!assistColorMap[a]){ assistColorMap[a]=assistColors[assistIdx++ % assistColors.length]; } return assistColorMap[a]; })(c.assigned_to) + ';font-weight:700;margin-bottom:2px">' + esc(c.assigned_to) + '</div>' : '')
               + '<span class="ztbl-acc' + (c.account ? '' : ' ztbl-acc-empty') + '">' + esc(c.account || '—') + '</span>'
               + (c.comment ? '<div class="ztbl-comment">' + esc(c.comment) + '</div>' : '')
               + '</td>';
