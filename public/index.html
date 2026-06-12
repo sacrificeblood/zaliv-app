@@ -112,33 +112,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .tbl-toolbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #2d3248; background: #1a1d27; flex-shrink: 0; flex-wrap: wrap; }
 .tbl-title { font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
 .date-tabs { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
-.dtab { padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid #2d3248; color: #64748b; transition: all .15s; white-space: nowrap; }
+.dtab { padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid #2d3248; color: #64748b; transition: all .15s; white-space: nowrap; }
 .dtab:hover { border-color: #16a34a; color: #4ade80; }
 .dtab.today { border-color: #14532d; color: #4ade80; }
-.dtab.active { background: #052e16; border-color: #16a34a; color: #bbf7d0; font-weight: 600; }
+.dtab.active { background: #052e16; border-color: #16a34a; color: #bbf7d0; font-weight: 700; }
 .tbl-wrap { flex: 1; overflow: auto; }
-.ztbl { border-collapse: collapse; min-width: 100%; table-layout: fixed; }
-.ztbl th { background: #1a1d27; border: 1px solid #2d3248; padding: 0; position: sticky; top: 0; z-index: 10; vertical-align: middle; }
-.ztbl th.th-num { width: 44px; min-width: 44px; text-align: center; }
-.th-inner { padding: 8px 10px 7px; }
-.th-src-name { font-size: 12px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.th-src-key { font-size: 10px; color: #334155; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
-.th-src-cnt { font-size: 10px; color: #475569; margin-top: 2px; }
-.th-sub { background: #141720; border: 1px solid #2d3248; padding: 6px 10px; font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; position: sticky; top: 52px; white-space: nowrap; }
-.ztd { border: 1px solid #1e293b; padding: 8px 10px; vertical-align: middle; background: #0f1117; font-size: 12px; }
-.ztd-edit { cursor: pointer; }
-.ztd-edit:hover { background: #1a1d27; }
-.ztbl td { border: 1px solid #1e293b; padding: 0; vertical-align: middle; background: #0f1117; }
-.ztbl td.td-num { background: #141720; text-align: center; font-size: 11px; color: #475569; width: 44px; min-width: 44px; padding: 8px 0; font-weight: 600; }
-.cell-inner { padding: 4px 6px; min-height: 30px; }
-.ze { display: flex; align-items: flex-start; gap: 4px; padding: 2px; border-radius: 4px; cursor: pointer; }
-.ze:hover { background: #1a1d27; }
-.ze-plt { width: 13px; height: 13px; border-radius: 2px; font-size: 8px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.no-data { padding: 60px; text-align: center; color: #334155; font-size: 13px; }
+
+/* NEW TABLE STYLES */
+.ztbl { border-collapse: collapse; }
+.ztbl-num { width: 44px; min-width: 44px; background: #141720; border: 1px solid #2d3248; text-align: center; font-size: 12px; color: #475569; font-weight: 600; padding: 8px 0; position: sticky; top: 0; z-index: 11; }
+.ztbl-src-hdr { background: #1a1d27; border: 1px solid #2d3248; padding: 10px 14px; text-align: center; position: sticky; top: 0; z-index: 10; }
+.th-src-name { font-size: 13px; font-weight: 700; color: #fff; }
+.th-src-key { font-size: 10px; color: #475569; margin-top: 3px; font-family: monospace; }
+.th-src-cnt { font-size: 11px; color: #64748b; margin-top: 3px; }
+.ztbl-sub { background: #141720; border: 1px solid #2d3248; padding: 6px 12px; font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .6px; position: sticky; top: 57px; z-index: 9; white-space: nowrap; }
+.ztbl-col-camp { min-width: 280px; }
+.ztbl-col-acc  { min-width: 130px; width: 150px; }
+.ztbl-col-st   { min-width: 95px;  width: 110px; }
+.ztbl-td { border: 1px solid #1e293b; padding: 8px 12px; vertical-align: middle; background: #0f1117; }
+.ztbl-td-copy { cursor: pointer; }
+.ztbl-td-copy:hover { background: #141720; }
+.ztbl-td-edit { cursor: pointer; }
+.ztbl-td-edit:hover { background: #141720; }
+.ztbl-camp-inner { display: flex; align-items: flex-start; gap: 7px; }
+.ze-plt { width: 15px; height: 15px; border-radius: 3px; font-size: 8px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
 .ze-plt.and { background: #052e16; color: #4ade80; }
 .ze-plt.ios { background: #0c1a3d; color: #60a5fa; }
-.ze-text { font-size: 11px; font-family: monospace; color: #94a3b8; flex: 1; line-height: 1.4; word-break: break-all; }
-.ze:hover .ze-text { color: #fff; }
-.no-data { padding: 60px; text-align: center; color: #334155; font-size: 13px; }
+.ztbl-neyming { font-size: 12px; font-family: monospace; color: #94a3b8; word-break: break-all; line-height: 1.5; }
+.ztbl-td-copy:hover .ztbl-neyming { color: #e2e8f0; }
+.ztbl-acc { font-size: 12px; color: #64748b; }
+.ztbl-acc-empty { color: #2d3248; }
+.ztbl-comment { font-size: 10px; color: #334155; font-style: italic; margin-top: 3px; }
+.ztbl-st-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 5px; border: 1px solid; display: inline-block; }
 
 /* MODAL */
 .modal-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 200; align-items: center; justify-content: center; }
@@ -717,54 +723,55 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       var maxR = 0;
       shown.forEach(function (s) { if (cols[s.id].length > maxR) maxR = cols[s.id].length; });
 
-      // Build table: per source = 3 cols: Кампания | Аккаунт | Статус
-      var html = '<table class="ztbl"><colgroup><col style="width:44px">';
+      // Table: per source = 3 cols
+      var html = '<table class="ztbl"><thead>';
+      // Row 1: source headers
+      html += '<tr><th class="ztbl-num"></th>';
+      shown.forEach(function(s) {
+        html += '<th colspan="3" class="ztbl-src-hdr">'
+          + '<div class="th-src-name">' + esc(s.name) + '</div>'
+          + (s.key_link ? '<div class="th-src-key">' + esc(s.key_link) + '</div>' : '')
+          + '<div class="th-src-cnt">' + cols[s.id].length + ' кампаний</div>'
+          + '</th>';
+      });
+      html += '</tr>';
+      // Row 2: sub-headers
+      html += '<tr><th class="ztbl-num"></th>';
       shown.forEach(function() {
-        html += '<col style="min-width:240px;width:280px"><col style="width:130px"><col style="width:100px">';
-      });
-      html += '</colgroup><thead><tr><th class="th-num"></th>';
-      shown.forEach(function (s) {
-        html += '<th colspan="3" style="text-align:center"><div class="th-inner">'
-          + '<div class="th-src-name" style="text-align:center">' + esc(s.name) + '</div>'
-          + (s.key_link ? '<div class="th-src-key" style="text-align:center">' + esc(s.key_link) + '</div>' : '')
-          + '<div class="th-src-cnt" style="text-align:center">' + cols[s.id].length + ' кампаний</div>'
-          + '</div></th>';
-      });
-      html += '</tr><tr><th class="th-num"></th>';
-      shown.forEach(function () {
-        html += '<th class="th-sub">Кампания</th><th class="th-sub">Аккаунт</th><th class="th-sub">Статус</th>';
+        html += '<th class="ztbl-sub ztbl-col-camp">Кампания</th>'
+             +  '<th class="ztbl-sub ztbl-col-acc">Аккаунт</th>'
+             +  '<th class="ztbl-sub ztbl-col-st">Статус</th>';
       });
       html += '</tr></thead><tbody>';
 
       for (var i = 0; i < maxR; i++) {
-        html += '<tr><td class="td-num">' + (i+1) + '</td>';
-        shown.forEach(function (s) {
+        html += '<tr><td class="ztbl-num">' + (i+1) + '</td>';
+        shown.forEach(function(s) {
           var c = cols[s.id][i];
-          var src = sources.find(function(x) { return x.id === s.id; }) || s;
+          var src = sources.find(function(x){ return x.id === s.id; }) || s;
           if (c) {
             var st = c.status || 'pending';
             var stLabel = st === 'ok' ? 'Прошло' : st === 'ban' ? 'Бан' : '—';
-            var stColor = st === 'ok' ? '#4ade80' : st === 'ban' ? '#f87171' : '#475569';
-            var stBg = st === 'ok' ? '#052e16' : st === 'ban' ? '#450a0a' : 'transparent';
-            var stBorder = st === 'ok' ? '#14532d' : st === 'ban' ? '#7f1d1d' : '#2d3248';
-            // Кампания cell - click to copy with sub3
-            html += '<td class="ztd" data-copy-camp="' + c.id + '" data-neyming="' + esc(c.neyming) + '" data-src-key="' + esc(src.key_link || '') + '" title="Нажми чтобы скопировать ссылку">'
-              + '<div style="display:flex;align-items:flex-start;gap:4px">'
-              + '<div class="ze-plt ' + (c.platform === 'ios' ? 'ios' : 'and') + '">' + (c.platform === 'ios' ? 'I' : 'A') + '</div>'
-              + '<div style="font-size:11px;font-family:monospace;color:#94a3b8;word-break:break-all;line-height:1.4">' + esc(c.neyming) + '</div>'
-              + '</div>'
+            var stColor = st === 'ok' ? '#4ade80' : st === 'ban' ? '#f87171' : '#64748b';
+            var stBg    = st === 'ok' ? '#052e16' : st === 'ban' ? '#450a0a' : 'transparent';
+            var stBd    = st === 'ok' ? '#14532d' : st === 'ban' ? '#7f1d1d' : '#2d3248';
+            // Кампания
+            html += '<td class="ztbl-td ztbl-td-copy" data-copy-camp="' + c.id + '" data-neyming="' + esc(c.neyming) + '" data-src-key="' + esc(src.key_link || '') + '">'
+              + '<div class="ztbl-camp-inner">'
+              + '<span class="ze-plt ' + (c.platform === 'ios' ? 'ios' : 'and') + '">' + (c.platform === 'ios' ? 'I' : 'A') + '</span>'
+              + '<span class="ztbl-neyming">' + esc(c.neyming) + '</span>'
+              + '</div></td>';
+            // Аккаунт
+            html += '<td class="ztbl-td ztbl-td-edit" data-open-ep="' + c.id + '">'
+              + '<span class="ztbl-acc' + (c.account ? '' : ' ztbl-acc-empty') + '">' + esc(c.account || '—') + '</span>'
+              + (c.comment ? '<div class="ztbl-comment">' + esc(c.comment) + '</div>' : '')
               + '</td>';
-            // Аккаунт cell - click to edit
-            html += '<td class="ztd ztd-edit" data-open-ep="' + c.id + '" title="Кликни чтобы редактировать">'
-              + '<span style="font-size:11px;color:' + (c.account ? '#64748b' : '#2d3248') + '">' + esc(c.account || '—') + '</span>'
-              + (c.comment ? '<div style="font-size:10px;color:#334155;font-style:italic;margin-top:2px">' + esc(c.comment) + '</div>' : '')
-              + '</td>';
-            // Статус cell - click to edit
-            html += '<td class="ztd ztd-edit" data-open-ep="' + c.id + '">'
-              + '<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;border:1px solid ' + stBorder + ';background:' + stBg + ';color:' + stColor + '">' + stLabel + '</span>'
+            // Статус
+            html += '<td class="ztbl-td ztbl-td-edit" data-open-ep="' + c.id + '">'
+              + '<span class="ztbl-st-badge" style="color:' + stColor + ';background:' + stBg + ';border-color:' + stBd + '">' + stLabel + '</span>'
               + '</td>';
           } else {
-            html += '<td class="ztd"></td><td class="ztd"></td><td class="ztd"></td>';
+            html += '<td class="ztbl-td"></td><td class="ztbl-td"></td><td class="ztbl-td"></td>';
           }
         });
         html += '</tr>';
