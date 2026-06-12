@@ -116,7 +116,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .dtab:hover { border-color: #16a34a; color: #4ade80; }
 .dtab.today { border-color: #14532d; color: #4ade80; }
 .dtab.active { background: #052e16; border-color: #16a34a; color: #bbf7d0; font-weight: 700; }
-.tbl-wrap { flex: 1; overflow: auto; }
+.tbl-filters { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid #1e293b; background: #0f1117; flex-shrink: 0; flex-wrap: wrap; }
+.tbl-filters-label { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; flex-shrink: 0; }
+.filter-chip { padding: 3px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; border: 1px solid #2d3248; color: #64748b; transition: all .12s; white-space: nowrap; }
+.filter-chip:hover { border-color: #475569; color: #e2e8f0; }
+.filter-chip.active { background: #1a1d27; border-color: #16a34a; color: #4ade80; font-weight: 600; }
+.filter-sep { width: 1px; height: 18px; background: #2d3248; flex-shrink: 0; margin: 0 4px; }
 .no-data { padding: 60px; text-align: center; color: #334155; font-size: 13px; }
 
 /* NEW TABLE STYLES */
@@ -130,16 +135,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .ztbl-col-camp { min-width: 280px; }
 .ztbl-col-acc  { min-width: 130px; width: 150px; }
 .ztbl-col-st   { min-width: 95px;  width: 110px; }
-.ztbl-td { border: 1px solid #1e293b; padding: 8px 12px; vertical-align: middle; background: #0f1117; }
+.ztbl-td { border: 1px solid #1e293b; padding: 6px 10px; vertical-align: middle; background: #0f1117; overflow: hidden; }
 .ztbl-td-copy { cursor: pointer; }
 .ztbl-td-copy:hover { background: #141720; }
 .ztbl-td-edit { cursor: pointer; }
 .ztbl-td-edit:hover { background: #141720; }
-.ztbl-camp-inner { display: flex; align-items: flex-start; gap: 7px; }
+.ztbl-camp-inner { display: flex; align-items: center; gap: 7px; overflow: hidden; }
 .ze-plt { width: 15px; height: 15px; border-radius: 3px; font-size: 8px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
 .ze-plt.and { background: #052e16; color: #4ade80; }
 .ze-plt.ios { background: #0c1a3d; color: #60a5fa; }
-.ztbl-neyming { font-size: 12px; font-family: monospace; color: #94a3b8; word-break: break-all; line-height: 1.5; }
+.ztbl-neyming { font-size: 12px; font-family: monospace; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
 .ztbl-td-copy:hover .ztbl-neyming { color: #e2e8f0; }
 .ztbl-acc { font-size: 12px; color: #64748b; }
 .ztbl-acc-empty { color: #2d3248; }
@@ -244,6 +249,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <span class="tbl-title">Таблица залива</span>
     <div class="date-tabs" id="date-tabs"></div>
   </div>
+  <div class="tbl-filters" id="tbl-filters"></div>
   <div class="tbl-wrap" id="tbl-wrap">
     <div class="no-data">Добавь кампании чтобы увидеть таблицу</div>
   </div>
@@ -276,6 +282,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <button class="ep-st-btn" id="ep-ok">Прошло</button>
       <button class="ep-st-btn" id="ep-ban">Бан</button>
     </div>
+    <span class="ep-label">Ассист (байер)</span>
+    <input type="text" class="ep-inp" id="ep-assigned" placeholder="burmalda, manna...">
     <span class="ep-label">Аккаунт</span>
     <input type="text" class="ep-inp" id="ep-account" placeholder="название аккаунта">
     <span class="ep-label">Комментарий</span>
@@ -297,6 +305,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   var editSrcId = null;
   var activeDateTab = null;
   var toastTimer = null;
+  var filterAssist = null;
+  var filterStatus = null;
+  var filterGeo = null;
 
   function esc(s) {
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -686,6 +697,72 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     } catch (e) { toast('Ошибка загрузки', 'err'); }
   }
 
+  function renderFilters(dc) {
+    var bar = document.getElementById('tbl-filters');
+    if (!bar) return;
+
+    // Collect unique values
+    var assists = [], geos = [], statuses = ['pending','ok','ban'];
+    dc.forEach(function(c) {
+      if (c.assigned_to && assists.indexOf(c.assigned_to) === -1) assists.push(c.assigned_to);
+      if (c.geo && geos.indexOf(c.geo) === -1) geos.push(c.geo);
+    });
+
+    var html = '';
+    if (assists.length) {
+      html += '<span class="tbl-filters-label">Ассист:</span>';
+      html += '<div class="filter-chip' + (!filterAssist ? ' active' : '') + '" data-fa="all">Все</div>';
+      assists.forEach(function(a) {
+        html += '<div class="filter-chip' + (filterAssist === a ? ' active' : '') + '" data-fa="' + esc(a) + '">' + esc(a) + '</div>';
+      });
+      html += '<div class="filter-sep"></div>';
+    }
+    if (geos.length > 1) {
+      html += '<span class="tbl-filters-label">ГЕО:</span>';
+      html += '<div class="filter-chip' + (!filterGeo ? ' active' : '') + '" data-fg="all">Все</div>';
+      geos.forEach(function(g) {
+        html += '<div class="filter-chip' + (filterGeo === g ? ' active' : '') + '" data-fg="' + esc(g) + '">' + esc(g) + '</div>';
+      });
+      html += '<div class="filter-sep"></div>';
+    }
+    html += '<span class="tbl-filters-label">Статус:</span>';
+    html += '<div class="filter-chip' + (!filterStatus ? ' active' : '') + '" data-fs="all">Все</div>';
+    html += '<div class="filter-chip' + (filterStatus === 'pending' ? ' active' : '') + '" data-fs="pending">В процессе</div>';
+    html += '<div class="filter-chip' + (filterStatus === 'ok' ? ' active' : '') + '" data-fs="ok">Прошло</div>';
+    html += '<div class="filter-chip' + (filterStatus === 'ban' ? ' active' : '') + '" data-fs="ban">Бан</div>';
+
+    bar.innerHTML = html;
+
+    bar.querySelectorAll('[data-fa]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        filterAssist = el.getAttribute('data-fa') === 'all' ? null : el.getAttribute('data-fa');
+        renderFilters(dc); applyFilters(dc);
+      });
+    });
+    bar.querySelectorAll('[data-fg]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        filterGeo = el.getAttribute('data-fg') === 'all' ? null : el.getAttribute('data-fg');
+        renderFilters(dc); applyFilters(dc);
+      });
+    });
+    bar.querySelectorAll('[data-fs]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        filterStatus = el.getAttribute('data-fs') === 'all' ? null : el.getAttribute('data-fs');
+        renderFilters(dc); applyFilters(dc);
+      });
+    });
+  }
+
+  function applyFilters(dc) {
+    var filtered = dc.filter(function(c) {
+      if (filterAssist && (c.assigned_to || '') !== filterAssist) return false;
+      if (filterStatus && (c.status || 'pending') !== filterStatus) return false;
+      if (filterGeo && c.geo !== filterGeo) return false;
+      return true;
+    });
+    renderTableData(filtered);
+  }
+
   function renderDateTabs(dates) {
     var el = document.getElementById('date-tabs');
     var today = kievToday();
@@ -709,7 +786,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     wrap.innerHTML = '<div style="padding:40px;text-align:center;color:#475569">Загрузка...</div>';
     try {
       var dc = await req('/api/campaigns?date=' + date);
-      if (!dc.length) { wrap.innerHTML = '<div class="no-data">Нет кампаний за ' + fmtDate(date) + '</div>'; return; }
+      if (!dc.length) { wrap.innerHTML = '<div class="no-data">Нет кампаний за ' + fmtDate(date) + '</div>'; renderFilters([]); return; }
+      renderFilters(dc);
+      applyFilters(dc);
+    } catch (e) { wrap.innerHTML = '<div class="no-data">Ошибка загрузки</div>'; }
+  }
+
+  function renderTableData(dc) {
+    var wrap = document.getElementById('tbl-wrap');
+    if (!dc.length) { wrap.innerHTML = '<div class="no-data">Нет кампаний по выбранным фильтрам</div>'; return; }
       var srcIds = [];
       dc.forEach(function (c) { if (c.source_id && srcIds.indexOf(c.source_id) === -1) srcIds.push(c.source_id); });
       var shown = sources.filter(function (s) { return srcIds.indexOf(s.id) !== -1; });
@@ -763,6 +848,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
               + '</div></td>';
             // Аккаунт
             html += '<td class="ztbl-td ztbl-td-edit" data-open-ep="' + c.id + '">'
+              + (c.assigned_to ? '<div style="font-size:10px;color:#16a34a;font-weight:700;margin-bottom:2px">' + esc(c.assigned_to) + '</div>' : '')
               + '<span class="ztbl-acc' + (c.account ? '' : ' ztbl-acc-empty') + '">' + esc(c.account || '—') + '</span>'
               + (c.comment ? '<div class="ztbl-comment">' + esc(c.comment) + '</div>' : '')
               + '</td>';
@@ -779,7 +865,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       html += '</tbody></table>';
       wrap.innerHTML = html;
 
-      // Copy camp: click on campaign cell
       wrap.querySelectorAll('[data-copy-camp]').forEach(function (el) {
         el.addEventListener('click', function () {
           var neyming = el.getAttribute('data-neyming');
@@ -791,15 +876,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         });
       });
 
-      // Open edit panel on status cell click
       wrap.querySelectorAll('[data-open-ep]').forEach(function (el) {
         el.addEventListener('click', function () {
           var cid = parseInt(el.getAttribute('data-open-ep'));
           openEditPanel(cid, dc);
         });
       });
-
-    } catch (e) { wrap.innerHTML = '<div class="no-data">Ошибка загрузки</div>'; }
   }
 
   // EDIT PANEL
@@ -814,11 +896,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     if (!c) return;
     epStatus = c.status || 'pending';
     document.getElementById('ep-neyming').textContent = c.neyming;
+    document.getElementById('ep-assigned').value = c.assigned_to || '';
     document.getElementById('ep-account').value = c.account || '';
     document.getElementById('ep-comment').value = c.comment || '';
     updateEpButtons();
     document.getElementById('ep-ov').classList.add('open');
-    setTimeout(function() { document.getElementById('ep-account').focus(); }, 60);
+    setTimeout(function() { document.getElementById('ep-assigned').focus(); }, 60);
   }
 
   function updateEpButtons() {
@@ -834,14 +917,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   document.getElementById('ep-cancel').addEventListener('click', function() { document.getElementById('ep-ov').classList.remove('open'); });
 
   document.getElementById('ep-save').addEventListener('click', async function() {
+    var assigned_to = document.getElementById('ep-assigned').value.trim();
     var account = document.getElementById('ep-account').value.trim();
     var comment = document.getElementById('ep-comment').value.trim();
     try {
-      var saved = await req('/api/campaigns/' + epCampId, 'PATCH', { status: epStatus, account: account, comment: comment });
-      // update in campaigns array
+      var saved = await req('/api/campaigns/' + epCampId, 'PATCH', { status: epStatus, account: account, comment: comment, assigned_to: assigned_to });
       var i = campaigns.findIndex(function(x) { return x.id === epCampId; });
       if (i !== -1) campaigns[i] = Object.assign(campaigns[i], saved);
-      // update in dateCamps
       var j = epDateCamps.findIndex(function(x) { return x.id === epCampId; });
       if (j !== -1) epDateCamps[j] = Object.assign(epDateCamps[j], saved);
       document.getElementById('ep-ov').classList.remove('open');
