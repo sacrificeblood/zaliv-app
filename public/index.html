@@ -137,7 +137,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* NEW TABLE STYLES */
 .ztbl { border-collapse: collapse; white-space: nowrap; }
-.ztbl-num { width: 44px; min-width: 44px; background: #141720; border: 1px solid #2d3248; text-align: center; font-size: 12px; color: #475569; font-weight: 600; padding: 8px 0; position: sticky; top: 0; z-index: 11; }
+.ztbl-chk-hdr { background: #1a1d27; border: 1px solid #2d3248; width: 32px; min-width: 32px; position: sticky; top: 0; z-index: 10; }
+.camp-checkbox { width: 14px; height: 14px; cursor: pointer; accent-color: #16a34a; } text-align: center; font-size: 12px; color: #475569; font-weight: 600; padding: 8px 0; position: sticky; top: 0; z-index: 11; }
 .ztbl-src-hdr { background: #1a1d27; border: 1px solid #2d3248; padding: 10px 14px; text-align: center; position: sticky; top: 0; z-index: 10; }
 .th-src-name { font-size: 13px; font-weight: 700; color: #fff; }
 .th-src-key { font-size: 10px; color: #475569; margin-top: 3px; font-family: monospace; }
@@ -239,13 +240,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           </div>
           <div class="fg" style="min-width:90px">
             <label>&nbsp;</label>
-            <button class="btn btn-primary" id="btn-add" >Добавить</button>
+            <button class="btn btn-primary" id="btn-add">Добавить</button>
           </div>
         </div>
         <div class="form-hint" style="margin-top:8px">
           Формат: <span>CA2x1</span> = CA 2 Android 1 iOS &nbsp;|&nbsp; <span>UK3</span> = UK 3 Android &nbsp;|&nbsp; несколько: <span>CA2x1 ITEU2x1 UK1</span>
         </div>
         <div class="preview-area" id="preview-area"></div>
+        <div id="add-progress" style="display:none;margin-top:10px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;color:#64748b">Создание кампаний...</span>
+            <span style="font-size:11px;color:#4ade80" id="add-progress-label">0 / 0</span>
+          </div>
+          <div style="height:4px;background:#1e293b;border-radius:2px;overflow:hidden">
+            <div id="add-progress-bar" style="height:100%;background:#16a34a;width:0%;transition:width .2s;border-radius:2px"></div>
+          </div>
+        </div>
       </div>
       <div class="plan-camps" id="plan-camps">
         <div class="empty-msg">Добавь источник чтобы начать</div>
@@ -261,6 +271,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="date-tabs" id="date-tabs"></div>
   </div>
   <div class="tbl-filters" id="tbl-filters"></div>
+  <div id="mass-delete-bar" style="display:none;align-items:center;gap:10px;padding:8px 16px;background:#450a0a;border-bottom:1px solid #7f1d1d;flex-shrink:0">
+    <span style="font-size:12px;color:#f87171" id="mass-delete-label">0 выбрано</span>
+    <button class="btn btn-sm" style="background:#dc2626;color:#fff;border:none" id="btn-mass-delete">Удалить выбранные</button>
+    <button class="btn btn-secondary btn-sm" id="btn-mass-cancel">Отмена</button>
+    <button class="btn btn-secondary btn-sm" id="btn-select-all">Выбрать все</button>
+  </div>
   <div class="tbl-wrap" id="tbl-wrap">
     <div class="no-data">Добавь кампании чтобы увидеть таблицу</div>
   </div>
@@ -596,13 +612,58 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       }
     });
 
+  var isAdding = false;
+
+  // ADD
+  document.getElementById('btn-add').addEventListener('click', async function () {
+    if (isAdding) return;
+    var raw = document.getElementById('fg-input').value;
+    var cr = document.getElementById('fg-creative').value.trim();
+    var as = document.getElementById('fg-assist').value.trim();
+    var srcAndId = parseInt(document.getElementById('fg-src-and').value);
+    var srcIosId = parseInt(document.getElementById('fg-src-ios').value);
+    var plan_date = document.getElementById('fg-date').value || kievToday();
+
+    if (!raw) { toast('Заполни поле ГЕО', 'err'); return; }
+    if (!cr) { toast('Заполни крео', 'err'); return; }
+    if (!srcAndId) { toast('Создай источник сначала', 'err'); return; }
+
+    var parsed = parseInput(raw);
+    if (!parsed) { toast('Формат: CA2x1 ITEU2 UK1x2', 'err'); return; }
+
+    var toAdd = [];
+    parsed.forEach(function(p) {
+      for (var i = 0; i < p.android; i++) {
+        var n = buildN(p.geo, cr, as, 'android');
+        toAdd.push({ source_id: srcAndId, geo: p.geo, creative: cr, assistant: as, platform: 'android', neyming: n });
+      }
+      for (var i = 0; i < p.ios; i++) {
+        var n = buildN(p.geo, cr, as, 'ios');
+        toAdd.push({ source_id: srcIosId, geo: p.geo, creative: cr, assistant: as, platform: 'ios', neyming: n });
+      }
+    });
+
     if (!toAdd.length) { toast('Нечего добавлять', 'err'); return; }
 
-    setSt('Сохранение...');
+    // Show progress bar and block button
+    isAdding = true;
+    var btnAdd = document.getElementById('btn-add');
+    btnAdd.disabled = true;
+    btnAdd.textContent = 'Создание...';
+    var progWrap = document.getElementById('add-progress');
+    var progBar = document.getElementById('add-progress-bar');
+    var progLabel = document.getElementById('add-progress-label');
+    progWrap.style.display = 'block';
+    progBar.style.width = '0%';
+    progLabel.textContent = '0 / ' + toAdd.length;
+
     try {
       for (var j = 0; j < toAdd.length; j++) {
         var saved = await req('/api/campaigns', 'POST', Object.assign({ plan_date: plan_date }, toAdd[j]));
         campaigns.push(saved);
+        var pct = Math.round((j + 1) / toAdd.length * 100);
+        progBar.style.width = pct + '%';
+        progLabel.textContent = (j + 1) + ' / ' + toAdd.length;
       }
       setSt('Сохранено ✓');
       setTimeout(function () { setSt(''); }, 2000);
@@ -612,6 +673,58 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       renderPlanCamps();
       toast('Добавлено ' + toAdd.length + ' кампаний', 'ok');
     } catch (e) { toast('Ошибка: ' + e.message, 'err'); setSt(''); }
+
+    // Hide progress and re-enable button
+    setTimeout(function() {
+      progWrap.style.display = 'none';
+      progBar.style.width = '0%';
+    }, 800);
+    isAdding = false;
+    btnAdd.disabled = false;
+    btnAdd.textContent = 'Добавить';
+  });
+
+  // MASS DELETE
+  var selectedCamps = {};
+
+  function updateMassDeleteBar() {
+    var count = Object.keys(selectedCamps).filter(function(k){ return selectedCamps[k]; }).length;
+    var bar = document.getElementById('mass-delete-bar');
+    if (count > 0) {
+      bar.style.display = 'flex';
+      document.getElementById('mass-delete-label').textContent = count + ' выбрано';
+    } else {
+      bar.style.display = 'none';
+    }
+  }
+
+  document.getElementById('btn-mass-cancel').addEventListener('click', function() {
+    selectedCamps = {};
+    document.querySelectorAll('.camp-checkbox').forEach(function(cb){ cb.checked = false; });
+    updateMassDeleteBar();
+  });
+
+  document.getElementById('btn-select-all').addEventListener('click', function() {
+    document.querySelectorAll('.camp-checkbox').forEach(function(cb){
+      cb.checked = true;
+      selectedCamps[cb.getAttribute('data-cid')] = true;
+    });
+    updateMassDeleteBar();
+  });
+
+  document.getElementById('btn-mass-delete').addEventListener('click', async function() {
+    var ids = Object.keys(selectedCamps).filter(function(k){ return selectedCamps[k]; });
+    if (!ids.length) return;
+    if (!confirm('Удалить ' + ids.length + ' кампаний?')) return;
+    try {
+      for (var i = 0; i < ids.length; i++) {
+        await req('/api/campaigns/' + ids[i], 'DELETE');
+      }
+      selectedCamps = {};
+      document.getElementById('mass-delete-bar').style.display = 'none';
+      loadTableDate(activeDateTab);
+      toast('Удалено ' + ids.length + ' кампаний', 'ok');
+    } catch(e) { toast('Ошибка', 'err'); }
   });
 
   async function delCamp(id) {
@@ -885,10 +998,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       var maxR = 0;
       shown.forEach(function (s) { if (cols[s.id].length > maxR) maxR = cols[s.id].length; });
 
-      // Table: per source = 3 cols
+      // Table: per source = 3 cols + checkbox
       var html = '<table class="ztbl"><thead>';
-      // Row 1: source headers
-      html += '<tr><th class="ztbl-num"></th>';
+      html += '<tr><th class="ztbl-num"></th><th class="ztbl-chk-hdr"></th>';
       shown.forEach(function(s) {
         html += '<th colspan="3" class="ztbl-src-hdr">'
           + '<div class="th-src-name">' + esc(s.name) + '</div>'
@@ -897,8 +1009,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           + '</th>';
       });
       html += '</tr>';
-      // Row 2: sub-headers
-      html += '<tr><th class="ztbl-num"></th>';
+      html += '<tr><th class="ztbl-num"></th><th class="ztbl-chk-hdr"></th>';
       shown.forEach(function() {
         html += '<th class="ztbl-sub ztbl-col-camp">Кампания</th>'
              +  '<th class="ztbl-sub ztbl-col-acc">Аккаунт</th>'
@@ -907,7 +1018,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       html += '</tr></thead><tbody>';
 
       for (var i = 0; i < maxR; i++) {
-        html += '<tr><td class="ztbl-num">' + (i+1) + '</td>';
+        // Collect all camp IDs in this row for checkbox
+        var rowCampIds = [];
+        shown.forEach(function(s){ var c = cols[s.id][i]; if(c) rowCampIds.push(c.id); });
+        var rowIdsStr = rowCampIds.join(',');
+        html += '<tr><td class="ztbl-num">' + (i+1) + '</td>'
+          + '<td class="ztbl-td" style="width:32px;min-width:32px;text-align:center;padding:0 6px">'
+          + '<input type="checkbox" class="camp-checkbox" data-cids="' + rowIdsStr + '">'
+          + '</td>';
         shown.forEach(function(s) {
           var c = cols[s.id][i];
           var src = sources.find(function(x){ return x.id === s.id; }) || s;
@@ -942,7 +1060,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       html += '</tbody></table>';
       wrap.innerHTML = html;
 
-      wrap.querySelectorAll('[data-copy-camp]').forEach(function (el) {
+      wrap.querySelectorAll('.camp-checkbox').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+          var ids = cb.getAttribute('data-cids').split(',');
+          ids.forEach(function(id){ if(id) selectedCamps[id] = cb.checked; });
+          updateMassDeleteBar();
+        });
+      });
         el.addEventListener('click', function () {
           var neyming = el.getAttribute('data-neyming');
           var keyLink = el.getAttribute('data-src-key');
