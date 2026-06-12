@@ -162,9 +162,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="add-form">
         <div class="add-form-title">Добавить кампании</div>
         <div class="form-row">
-          <div class="fg fg-input">
-            <label>ГЕО x Android x iOS</label>
-            <input type="text" id="fg-input" placeholder="CAx2 или CAx2x1">
+          <div class="fg" style="flex:1;min-width:280px">
+            <label>ГЕО (через пробел)</label>
+            <input type="text" id="fg-input" placeholder="CA2x1 ITEU2x1 UK1">
           </div>
           <div class="fg fg-creative">
             <label>Крео</label>
@@ -191,7 +191,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           </div>
         </div>
         <div class="form-hint">
-          Формат: <span>CAx2</span> = 2 Android на CA &nbsp;|&nbsp; <span>CAx2x1</span> = 2 Android + 1 iOS на CA &nbsp;|&nbsp; <span>CAx0x3</span> = 3 iOS на CA
+          Формат: <span>CA2x1</span> = CA 2 Android 1 iOS &nbsp;|&nbsp; <span>UK3</span> = UK 3 Android &nbsp;|&nbsp; несколько: <span>CA2x1 ITEU2x1 UK1</span>
         </div>
         <div class="preview-area" id="preview-area"></div>
       </div>
@@ -394,17 +394,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     return parts.join('x');
   }
 
-  // Parse "CAx2" or "CAx2x1"
+  // Parse "CA2x1 ITEU2x1 UK3" -> array of {geo, android, ios}
   function parseInput(raw) {
-    var s = raw.trim();
-    if (!s) return null;
-    var parts = s.split('x');
-    if (parts.length < 2) return null;
-    var geo = parts[0].toUpperCase();
-    var android = parseInt(parts[1]) || 0;
-    var ios = parts[2] ? (parseInt(parts[2]) || 0) : 0;
-    if (!geo) return null;
-    return { geo: geo, android: android, ios: ios };
+    var blocks = raw.trim().split(/\s+/);
+    var result = [];
+    blocks.forEach(function(block) {
+      if (!block) return;
+      // Match: letters (GEO) + digits (android) + optional "x" + digits (ios)
+      var m = block.match(/^([A-Za-z]+)(\d+)(?:x(\d+))?$/);
+      if (!m) return;
+      var geo = m[1].toUpperCase();
+      var android = parseInt(m[2]) || 0;
+      var ios = m[3] ? (parseInt(m[3]) || 0) : 0;
+      if (geo && (android > 0 || ios > 0)) {
+        result.push({ geo: geo, android: android, ios: ios });
+      }
+    });
+    return result.length ? result : null;
   }
 
   function updatePreview() {
@@ -416,14 +422,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     var parsed = parseInput(raw);
     if (!parsed) { area.innerHTML = ''; return; }
     var html = '';
-    for (var i = 0; i < parsed.android; i++) {
-      var n = buildN(parsed.geo, cr, as, 'android');
-      html += '<span class="pchip and" data-n="' + esc(n) + '">A: ' + esc(n) + '</span>';
-    }
-    for (var i = 0; i < parsed.ios; i++) {
-      var n = buildN(parsed.geo, cr, as, 'ios');
-      html += '<span class="pchip ios" data-n="' + esc(n) + '">I: ' + esc(n) + '</span>';
-    }
+    parsed.forEach(function(p) {
+      for (var i = 0; i < p.android; i++) {
+        var n = buildN(p.geo, cr, as, 'android');
+        html += '<span class="pchip and" data-n="' + esc(n) + '">A/' + esc(p.geo) + ': ' + esc(n) + '</span>';
+      }
+      for (var i = 0; i < p.ios; i++) {
+        var n = buildN(p.geo, cr, as, 'ios');
+        html += '<span class="pchip ios" data-n="' + esc(n) + '">I/' + esc(p.geo) + ': ' + esc(n) + '</span>';
+      }
+    });
     area.innerHTML = html;
     area.querySelectorAll('.pchip').forEach(function (chip) {
       chip.addEventListener('click', function () {
@@ -448,23 +456,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     var srcIosId = parseInt(document.getElementById('fg-src-ios').value);
     var plan_date = document.getElementById('fg-date').value || kievToday();
 
-    if (!raw) { toast('Заполни поле ГЕО x Android x iOS', 'err'); return; }
+    if (!raw) { toast('Заполни поле ГЕО', 'err'); return; }
     if (!cr) { toast('Заполни крео', 'err'); return; }
     if (!srcAndId) { toast('Создай источник сначала', 'err'); return; }
 
     var parsed = parseInput(raw);
-    if (!parsed) { toast('Формат: CAx2 или CAx2x1', 'err'); return; }
-    if (parsed.android === 0 && parsed.ios === 0) { toast('Укажи хотя бы одну кампанию', 'err'); return; }
+    if (!parsed) { toast('Формат: CA2x1 ITEU2 UK1x2', 'err'); return; }
 
     var toAdd = [];
-    for (var i = 0; i < parsed.android; i++) {
-      var n = buildN(parsed.geo, cr, as, 'android');
-      toAdd.push({ source_id: srcAndId, geo: parsed.geo, creative: cr, assistant: as, platform: 'android', neyming: n });
-    }
-    for (var i = 0; i < parsed.ios; i++) {
-      var n = buildN(parsed.geo, cr, as, 'ios');
-      toAdd.push({ source_id: srcIosId, geo: parsed.geo, creative: cr, assistant: as, platform: 'ios', neyming: n });
-    }
+    parsed.forEach(function(p) {
+      for (var i = 0; i < p.android; i++) {
+        var n = buildN(p.geo, cr, as, 'android');
+        toAdd.push({ source_id: srcAndId, geo: p.geo, creative: cr, assistant: as, platform: 'android', neyming: n });
+      }
+      for (var i = 0; i < p.ios; i++) {
+        var n = buildN(p.geo, cr, as, 'ios');
+        toAdd.push({ source_id: srcIosId, geo: p.geo, creative: cr, assistant: as, platform: 'ios', neyming: n });
+      }
+    });
+
+    if (!toAdd.length) { toast('Нечего добавлять', 'err'); return; }
 
     setSt('Сохранение...');
     try {
