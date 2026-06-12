@@ -39,10 +39,11 @@ async function initDB() {
         account VARCHAR(255) DEFAULT '',
         created_at TIMESTAMP DEFAULT NOW()
       );
-      -- migrate existing tables
+      -- migrate
       ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'pending';
       ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS comment TEXT DEFAULT '';
       ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS account VARCHAR(255) DEFAULT '';
+      ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS assigned_to VARCHAR(255) DEFAULT '';
     `);
     console.log('DB initialized');
   } finally {
@@ -123,10 +124,10 @@ app.delete('/api/campaigns/:id', async (req, res) => {
 
 app.patch('/api/campaigns/:id', async (req, res) => {
   try {
-    const { status, comment, account } = req.body;
+    const { status, comment, account, assigned_to } = req.body;
     const r = await pool.query(
-      'UPDATE campaigns SET status=$1, comment=$2, account=$3 WHERE id=$4 RETURNING *',
-      [status || 'pending', comment || '', account || '', req.params.id]);
+      'UPDATE campaigns SET status=$1, comment=$2, account=$3, assigned_to=$4 WHERE id=$5 RETURNING *',
+      [status || 'pending', comment || '', account || '', assigned_to || '', req.params.id]);
     res.json(r.rows[0]);
   } catch(e) { res.status(500).json({error: e.message}); }
 });
